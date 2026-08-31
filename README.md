@@ -13,7 +13,13 @@
 </p>
 
 <p align="center">
-  <a href="https://ai-scam-phishing-detector-pk.streamlit.app" target="_blank"><strong>Live Demo</strong></a>
+  <a href="https://ai-scam-phishing-detector-pk.streamlit.app" target="_blank">
+    <img src="https://img.shields.io/badge/Live%20Demo-ONLINE-brightgreen?style=for-the-badge&logo=streamlit&logoColor=white" alt="Live Demo Online">
+  </a>
+</p>
+
+<p align="center">
+  <a href="https://ai-scam-phishing-detector-pk.streamlit.app" target="_blank"><strong>Open Live Demo</strong></a>
   &nbsp;&bull;&nbsp;
   <a href="#how-it-works">How It Works</a>
   &nbsp;&bull;&nbsp;
