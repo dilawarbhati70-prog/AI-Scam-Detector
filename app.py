@@ -1612,7 +1612,7 @@ def call_gemini_json(prompt, contents=None, temperature=0.2):
 
     try:
         response = client.models.generate_content(
-            model="gemini-2.5-flash",
+            model="gemini-3.6-flash",
             contents=call_contents,
             config=genai_types.GenerateContentConfig(
                 temperature=temperature,
@@ -1627,7 +1627,7 @@ def call_gemini_json(prompt, contents=None, temperature=0.2):
         )
         try:
             response = client.models.generate_content(
-                model="gemini-2.5-flash",
+                model="gemini-3.6-flash",
                 contents=call_contents,
                 config=genai_types.GenerateContentConfig(
                     temperature=temperature,
