@@ -28,6 +28,10 @@
   <a href="#features">Features</a>
 </p>
 
+<p align="center">
+  <img src="screenshot.png" alt="ScamShield AI Interface" width="800">
+</p>
+
 ---
 
 ## Why ScamShield AI?
