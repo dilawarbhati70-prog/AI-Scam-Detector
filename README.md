@@ -47,14 +47,16 @@ Scam and phishing attacks cost individuals and businesses billions every year �
 | **URL intelligence** | Typosquatting detection (Levenshtein distance, hyphen-segment aware), homograph attack detection, entropy analysis, URL-shortener flagging, and keyword risk scoring. |
 | **Threat intelligence APIs** | Optional Google Safe Browsing and VirusTotal integration for real-time domain reputation checks. |
 | **Screenshot OCR** | Extract text from uploaded screenshots via Tesseract OCR, then run the full detection pipeline on the extracted content. |
+| **QR code scanner** | Decode uploaded or camera-captured QR codes locally, then inspect public HTTP(S) destinations with the URL intelligence pipeline. |
 | **Persistent history** | Analysis results are stored in a local SQLite database with per-entry HTML report export (print-to-PDF ready). |
+| **Protection statistics** | A live dashboard summarizes total scans, high-risk detections, safe messages, and the score-based detection rate from local history. |
 | **Risk scoring** | 0-100 composite risk score with color-coded verdict: Safe, Suspicious, or Dangerous. |
 | **Privacy-first** | API keys stay in `secrets.toml`, user data never leaves the local machine except for the AI analysis call, and a visible security reminder warns against entering real credentials. |
 
 ## How It Works
 
 ```
-User Input (text / URL / screenshot)
+User Input (text / URL / screenshot / QR code)
         │
         ▼
 ┌─────────────────────────────────────────┐
@@ -94,6 +96,7 @@ Local detectors run first and feed their findings as **pre-signals** into the Ge
 | **AI Model** | Google Gemini (via `google-genai`) |
 | **URL Parsing** | `tldextract`, `idna` |
 | **OCR** | Tesseract (`pytesseract` + `Pillow`) |
+| **QR Decoding** | OpenCV (`opencv-python-headless`) |
 | **Threat Intel** | Google Safe Browsing API, VirusTotal API |
 | **Storage** | SQLite (`sqlite3` stdlib) |
 | **Language** | Python 3.10+ |
@@ -103,8 +106,11 @@ Local detectors run first and feed their findings as **pre-signals** into the Ge
 ### Prerequisites
 
 - Python 3.10 or later
-- A [Google Gemini API key](https://aistudio.google.com/apikey) (free tier available)
+- A [Google Gemini API key](https://aistudio.google.com/apikey) (free tier available) for text and screenshot AI analysis
 - *(Optional)* [Tesseract OCR](https://tesseract-ocr.github.io/tessdoc/Installation.html) installed on your system for screenshot analysis
+- *(Optional)* A browser with camera access to localhost or HTTPS for QR camera capture
+
+The QR scanner can still perform local URL checks when no Gemini key is configured.
 
 ### 1. Clone the repository
 
@@ -126,10 +132,16 @@ Create `.streamlit/secrets.toml` in the project root:
 ```toml
 GEMINI_API_KEY = "your-gemini-api-key"
 
+# Optional: select a specific available Gemini model.
+# If omitted, ScamShield AI selects an available Flash model.
+GEMINI_MODEL = "gemini-2.0-flash"
+
 # Optional: enable real-time domain reputation
 GOOGLE_SAFE_BROWSING_KEY = "your-safe-browsing-key"
 VIRUSTOTAL_API_KEY = "your-virustotal-key"
 ```
+
+Screenshot uploads accept validated PNG, JPEG, and WebP images up to 10 MB and 16 megapixels. Camera access is used only by the QR scanner.
 
 ### 4. Run the app
 
