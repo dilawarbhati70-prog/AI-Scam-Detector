@@ -29,7 +29,7 @@
 </p>
 
 <p align="center">
-  <img src="screenshot.png" alt="ScamShield AI Interface" width="800">
+  <img src="docs/images/homepage.png" alt="ScamShield AI homepage" width="800">
 </p>
 
 ---
@@ -87,6 +87,14 @@ User Input (text / URL / screenshot / QR code)
 ```
 
 Local detectors run first and feed their findings as **pre-signals** into the Gemini prompt, so the AI can confirm, refine, or add context — producing a more accurate and explainable result than either approach alone.
+
+### Demo: Sample Scam Analysis
+
+A fictional banking-phishing message is flagged with urgency indicators, likely scam categories, and link-risk signals before any action is taken.
+
+<p align="center">
+  <img src="docs/images/sample-scam-analysis.png" alt="Sample scam analysis showing warning signs, categories, and link analysis" width="800">
+</p>
 
 ## Tech Stack
 
