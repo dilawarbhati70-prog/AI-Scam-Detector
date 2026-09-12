@@ -141,8 +141,8 @@ Create `.streamlit/secrets.toml` in the project root:
 GEMINI_API_KEY = "your-gemini-api-key"
 
 # Optional: select a specific available Gemini model.
-# If omitted, ScamShield AI selects an available Flash model.
-GEMINI_MODEL = "gemini-2.0-flash"
+# If omitted, ScamShield AI uses `gemini-3.6-flash`.
+GEMINI_MODEL = "gemini-3.6-flash"
 
 # Optional: enable real-time domain reputation
 GOOGLE_SAFE_BROWSING_KEY = "your-safe-browsing-key"

@@ -402,25 +402,7 @@ def resolve_gemini_model():
     if preferred_model:
         return preferred_model
 
-    try:
-        for model in client.models.list():
-            name = str(getattr(model, "name", "")).removeprefix(
-                "models/"
-            )
-            actions = [
-                str(action).lower()
-                for action in getattr(model, "supported_actions", []) or []
-            ]
-            supports_generation = (
-                not actions
-                or any("generatecontent" in action for action in actions)
-            )
-            if name and "flash" in name.lower() and supports_generation:
-                return name
-    except Exception:
-        return None
-
-    return None
+    return "gemini-3.6-flash"
 
 
 # =========================================================
@@ -443,7 +425,7 @@ with st.sidebar:
         configured_gemini_model = ""
 
     gemini_status = configured_gemini_model or (
-        "Configured (auto-selects on analysis)" if client else "Unavailable"
+        "gemini-3.6-flash" if client else "Unavailable"
     )
     st.caption(f"🤖 Gemini model: {gemini_status}")
 
