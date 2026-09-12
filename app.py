@@ -141,12 +141,18 @@ st.markdown("""
     background: #f8fafc;
     border: 1px solid #e5e7eb;
     min-height: 150px;
+    color: #111827;
+}
+
+.feature-card * {
+    color: inherit;
 }
 
 .feature-title {
     font-size: 19px;
     font-weight: 750;
     margin-bottom: 8px;
+    color: #111827;
 }
 
 .feature-text {
