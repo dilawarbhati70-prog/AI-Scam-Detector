@@ -8,6 +8,7 @@ import html
 import unicodedata
 import sqlite3
 import os
+import sys
 import ipaddress
 from urllib.parse import urlparse
 from datetime import datetime
@@ -411,6 +412,24 @@ def resolve_gemini_model():
     return "gemini-3.6-flash"
 
 
+@st.cache_resource(show_spinner=False)
+def resolve_gemini_vision_model():
+    if client is None:
+        return None
+
+    try:
+        preferred_model = str(
+            st.secrets.get("GEMINI_VISION_MODEL", "")
+        ).strip()
+    except Exception:
+        preferred_model = ""
+
+    if preferred_model:
+        return preferred_model
+
+    return "gemini-3.8-flash"
+
+
 # =========================================================
 # SIDEBAR
 # =========================================================
@@ -430,10 +449,24 @@ with st.sidebar:
     except Exception:
         configured_gemini_model = ""
 
-    gemini_status = configured_gemini_model or (
-        "gemini-3.6-flash" if client else "Unavailable"
-    )
-    st.caption(f"🤖 Gemini model: {gemini_status}")
+    try:
+        configured_gemini_vision_model = str(
+            st.secrets.get("GEMINI_VISION_MODEL", "")
+        ).strip()
+    except Exception:
+        configured_gemini_vision_model = ""
+
+    if client:
+        st.caption(
+            "🤖 Text model: "
+            f"{configured_gemini_model or 'gemini-3.6-flash'}"
+        )
+        st.caption(
+            "👁️ Vision model: "
+            f"{configured_gemini_vision_model or 'gemini-3.8-flash'}"
+        )
+    else:
+        st.caption("🤖 Gemini model: Unavailable")
 
     st.divider()
 
@@ -2378,36 +2411,68 @@ def normalize_analysis(analysis):
     }
 
 
-def call_gemini_json(prompt, contents=None, temperature=0.2):
+def call_gemini_json(prompt, contents=None, temperature=0.2, vision=False):
     """Return a normalized Gemini analysis or a user-safe error message."""
 
-    model_name = resolve_gemini_model()
-    if not model_name:
+    if vision:
+        candidates = (
+            resolve_gemini_vision_model(),
+            resolve_gemini_model(),
+        )
+    else:
+        candidates = (resolve_gemini_model(),)
+
+    model_names = []
+
+    for candidate in candidates:
+        if candidate and candidate not in model_names:
+            model_names.append(candidate)
+
+    if not model_names:
         return None, "AI analysis is unavailable because no Gemini model could be resolved."
 
     call_contents = contents if contents is not None else prompt
 
-    try:
-        response = client.models.generate_content(
-            model=model_name,
-            contents=call_contents,
-            config=genai_types.GenerateContentConfig(
-                temperature=temperature,
-                response_mime_type="application/json",
-                response_schema=RESPONSE_SCHEMA,
-            ),
-        )
-    except Exception:
+    response = None
+    failure_details = []
+
+    for model_name in model_names:
         try:
             response = client.models.generate_content(
                 model=model_name,
                 contents=call_contents,
                 config=genai_types.GenerateContentConfig(
                     temperature=temperature,
+                    response_mime_type="application/json",
+                    response_schema=RESPONSE_SCHEMA,
                 ),
             )
-        except Exception:
-            return None, "AI analysis is temporarily unavailable. Please try again later."
+            break
+        except Exception as schema_error:
+            try:
+                response = client.models.generate_content(
+                    model=model_name,
+                    contents=call_contents,
+                    config=genai_types.GenerateContentConfig(
+                        temperature=temperature,
+                    ),
+                )
+                break
+            except Exception as plain_error:
+                failure_details.append(
+                    f"{model_name}: "
+                    f"{type(plain_error).__name__}: {plain_error} "
+                    f"(schema attempt: "
+                    f"{type(schema_error).__name__}: {schema_error})"
+                )
+
+    if response is None:
+        print(
+            f"[ScamShield] Gemini call failed (vision={vision}): "
+            + " | ".join(failure_details),
+            file=sys.stderr,
+        )
+        return None, "AI analysis is temporarily unavailable. Please try again later."
 
     try:
         raw_text = str(getattr(response, "text", "") or "").strip()
@@ -3268,6 +3333,7 @@ the screenshot as the 'text' value.
                             prompt,
                             image_part,
                         ],
+                        vision=True,
                     )
                     if analysis_error:
                         raise AIAnalysisError(analysis_error)
