@@ -409,7 +409,7 @@ def resolve_gemini_model():
     if preferred_model:
         return preferred_model
 
-    return "gemini-3.6-flash"
+    return "gemini-2.5-flash"
 
 
 @st.cache_resource(show_spinner=False)
@@ -427,7 +427,7 @@ def resolve_gemini_vision_model():
     if preferred_model:
         return preferred_model
 
-    return "gemini-3.8-flash"
+    return "gemini-2.5-flash"
 
 
 # =========================================================
