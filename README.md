@@ -188,3 +188,25 @@ This project was built for the **Alibaba Cloud AI Hackathon Pakistan 2026** — 
 ## License
 
 MIT
+
+## Setup
+
+1. Install requirements:
+
+```
+pip install -r requirements.txt
+```
+
+2. Create a file `.streamlit/secrets.toml` and add your Gemini API key:
+
+```
+GEMINI_API_KEY = "your_key_here"
+```
+
+Get a free key from https://aistudio.google.com/apikey
+
+3. Run the app:
+
+```
+python -m streamlit run app.py
+```
